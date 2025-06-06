@@ -13,9 +13,9 @@ pipeline {
             }
         }
 
-        stage('Clone Repo') {
+        stage('Checkout SCM') {
             steps {
-                sh 'git clone https://github.com/nivemukr09/fraud-detector-devops.git .'
+                checkout scm
             }
         }
 
@@ -24,7 +24,6 @@ pipeline {
                 sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
-
 
         stage('Push to DockerHub') {
             steps {
