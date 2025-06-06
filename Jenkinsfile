@@ -7,6 +7,12 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Clone Repo') {
             steps {
                 git 'https://github.com/nivemukr09/fraud-detector-devops.git'
@@ -15,14 +21,14 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:latest ./app'
+                sh "docker build -t ${IMAGE_NAME}:latest ./app"
             }
         }
 
         stage('Push to DockerHub') {
             steps {
                 withDockerRegistry([credentialsId: 'dockerhub', url: '']) {
-                    sh 'docker push $IMAGE_NAME:latest'
+                    sh "docker push ${IMAGE_NAME}:latest"
                 }
             }
         }
