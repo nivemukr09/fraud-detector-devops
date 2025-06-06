@@ -13,11 +13,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Clone Repo') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:latest ./app"
+                sh 'git clone https://github.com/nivemukr09/fraud-detector-devops.git .'
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:latest ."
+            }
+        }
+
 
         stage('Push to DockerHub') {
             steps {
@@ -28,4 +35,3 @@ pipeline {
         }
     }
 }
-
