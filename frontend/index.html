@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InsureSure - Fraud Detector</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>InsureSure</h1>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Submit Claim</a>
+        <a href="#">Admin Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h2>Welcome to InsureSure</h2>
+      <p>Your trusted partner in detecting insurance fraud with AI precision.</p>
+      <a href="#claim-form" class="btn">Submit a Claim</a>
+    </section>
+
+    <section id="claim-form" class="form-section">
+      <h3>Submit Your Insurance Claim</h3>
+      <form id="claim-form-element">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="number" id="claim_amount" placeholder="Claim Amount" required />
+        <input type="number" id="num_of_accidents" placeholder="Number of Accidents" required />
+        <textarea id="description" placeholder="Description of Claim" required></textarea>
+        <button type="submit">Submit Claim</button>
+      </form>
+
+      <div id="result" class="result-box"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 InsureSure. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("claim-form-element").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const amount = document.getElementById("claim_amount").value;
+      const num_of_accidents = document.getElementById("num_of_accidents").value;
+      const description = document.getElementById("description").value;
+
+      const payload = {
+        claim_amount: parseFloat(amount),
+        num_of_accidents: parseInt(num_of_accidents)
+      };
+
+      try {
+        const response = await fetch("http://localhost:5000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("Server error");
+        }
+
+        const result = await response.json();
+        document.getElementById("result").innerText =
+          "Prediction: " + result.prediction + "\nConfidence: " + result.confidence + "%";
+      } catch (err) {
+        document.getElementById("result").innerText = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
