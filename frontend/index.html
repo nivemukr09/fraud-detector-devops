@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InsureSure - Fraud Detector</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    #loading-spinner {
+      display: none;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .result-box p {
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+
+    select, input, textarea {
+      display: block;
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 8px;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -30,11 +59,31 @@
       <form id="claim-form-element">
         <input type="text" id="name" placeholder="Name" required />
         <input type="email" id="email" placeholder="Email" required />
+        <input type="number" id="age" placeholder="Age" required />
+        <select id="claim_type" required>
+          <option value="">-- Select Claim Type --</option>
+          <option value="vehicle">Vehicle</option>
+          <option value="home">Home</option>
+          <option value="health">Health</option>
+        </select>
+        <select id="region" required>
+          <option value="">-- Select Region --</option>
+          <option value="north">North</option>
+          <option value="south">South</option>
+          <option value="east">East</option>
+          <option value="west">West</option>
+        </select>
         <input type="number" id="claim_amount" placeholder="Claim Amount" required />
         <input type="number" id="num_of_accidents" placeholder="Number of Accidents" required />
         <textarea id="description" placeholder="Description of Claim" required></textarea>
         <button type="submit">Submit Claim</button>
       </form>
+
+      <!-- Loading spinner -->
+      <div id="loading-spinner">
+        <img src="https://i.imgur.com/llF5iyg.gif" alt="Loading..." width="40" />
+        <p>Processing claim...</p>
+      </div>
 
       <div id="result" class="result-box"></div>
     </section>
@@ -46,39 +95,64 @@
     </div>
   </footer>
 
-  <script>
-    document.getElementById("claim-form-element").addEventListener("submit", async function (e) {
-      e.preventDefault();
+<script>
+  document.getElementById("claim-form-element").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const amount = document.getElementById("claim_amount").value;
-      const num_of_accidents = document.getElementById("num_of_accidents").value;
-      const description = document.getElementById("description").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const age = parseInt(document.getElementById("age").value.trim());
+    const claim_type = document.getElementById("claim_type").value;
+    const region = document.getElementById("region").value;
+    const amount = parseFloat(document.getElementById("claim_amount").value.trim());
+    const num_of_accidents = parseInt(document.getElementById("num_of_accidents").value.trim());
+    const description = document.getElementById("description").value.trim();
+    const resultBox = document.getElementById("result");
+    const spinner = document.getElementById("loading-spinner");
 
-      const payload = {
-        claim_amount: parseFloat(amount),
-        num_of_accidents: parseInt(num_of_accidents)
-      };
+    // Clear previous result and show spinner
+    resultBox.innerHTML = "";
+    spinner.style.display = "block";
 
-      try {
-        const response = await fetch("http://localhost:5000/predict", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+    // Input validation
+    if (!name || !email || isNaN(age) || !claim_type || !region || isNaN(amount) || isNaN(num_of_accidents) || !description) {
+      spinner.style.display = "none";
+      resultBox.innerHTML = `<p class="error">⚠️ Please fill in all fields with valid data.</p>`;
+      return;
+    }
 
-        if (!response.ok) {
-          throw new Error("Server error");
-        }
+    const payload = {
+      claim_amount: amount,
+      num_of_accidents: num_of_accidents,
+      age: age,
+      claim_type: claim_type,
+      region: region
+    };
 
-        const result = await response.json();
-        document.getElementById("result").innerText =
-          "Prediction: " + result.prediction + "\nConfidence: " + result.confidence + "%";
-      } catch (err) {
-        document.getElementById("result").innerText = "Error: " + err.message;
-      }
-    });
-  </script>
+    try {
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error("Server error");
+
+      const result = await response.json();
+      const isFraud = result.prediction && result.prediction.toLowerCase().includes("fraud");
+      const colorClass = isFraud ? "error" : "success";
+      const icon = isFraud ? "⚠️" : "✅";
+
+      resultBox.innerHTML = `
+        <p class="${colorClass}">${icon} Prediction: ${result.prediction}</p>
+        <p><strong>Confidence:</strong> ${result.confidence}%</p>
+      `;
+    } catch (err) {
+      resultBox.innerHTML = `<p class="error">❌ Error: ${err.message}</p>`;
+    } finally {
+      spinner.style.display = "none"; // Hide spinner
+    }
+  });
+</script>
 </body>
 </html>
