@@ -25,17 +25,10 @@ Insurance fraud costs billions each year. This project uses an ML model to class
 - NumPy, Pandas
 - REST API with CORS enabled
 
-### Machine Learning
-- Logistic Regression
-- OneHotEncoding + ColumnTransformer
-- Pickle for model persistence
-
 ### DevOps
 - Docker (containerization)
 - Jenkins (CI pipeline)
 - Helm (packaging for Kubernetes)
-- ArgoCD (CD to Kubernetes)
-- Prometheus & Grafana (monitoring)
 - GitHub (source control)
 
 ---
