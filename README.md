@@ -62,10 +62,10 @@ fraud-detector-devops/
 ---
 
 ## 🔧 Local Setup
-
+```bash
 1. Clone the Repo
 
-```bash
+
 git clone https://github.com/nivemukr09/fraud-detector-devops.git
 cd fraud-detector-devops/backend/app
 
