@@ -40,27 +40,6 @@ Insurance fraud costs billions each year. This project uses an ML model to class
 
 ---
 
-## 🚀 Project Structure
-
-fraud-detector-devops/
-├── backend/
-│ ├── app/
-│ │ ├── main.py # Flask API
-│ │ ├── utils.py # Model loading & prediction logic
-│ │ ├── model.pkl # Trained ML model
-│ │ ├── requirements.txt # Python dependencies
-│ │ └── Dockerfile # Flask app container
-├── jenkins/
-│ └── Jenkinsfile # CI pipeline
-├── helm/
-│ └── fraud-detector-chart/ # Helm chart for deployment
-├── k8s/
-│ └── manifests.yaml # K8s manifests (optional if not using Helm)
-└── README.md
-
-
----
-
 ## 🔧 Local Setup
 ```bash
 1. Clone the Repo
